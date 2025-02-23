@@ -1,0 +1,2 @@
+#Cowrie (SSH Honeypot)
+docker run -d --name cowrie -p 2222:2222 cowrie/cowrie
