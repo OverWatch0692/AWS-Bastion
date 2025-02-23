@@ -1,0 +1,7 @@
+Go to AWS EC2 Dashboard → Launch Instance
+Choose Amazon Linux 2 or Ubuntu 22.04 as the AMI
+Select t2.micro (Free Tier Eligible)
+Configure Security Group:
+Allow SSH (22) (for admin access)
+Allow Custom TCP/UDP Ports (e.g., 2222 for SSH honeypot, 8080 for web honeypot)
+Launch the instance
