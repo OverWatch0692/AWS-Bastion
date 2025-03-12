@@ -1,0 +1,97 @@
+Windows Event Forwarding (WEF) allows for the centralized collection of event logs from multiple Windows servers, facilitating streamlined monitoring and security analysis. In our AWS environment, we configured WEF to forward event logs from source servers to a designated Event Collector server.
+
+2. Prerequisites
+
+Active Directory (AD) Domain: All participating servers must be part of the same AD domain.
+
+Windows Remote Management (WinRM): Ensure WinRM is enabled on all source and collector servers.
+
+3. Steps Undertaken
+
+a. Configure the Event Collector Server
+
+Enable WinRM: On the Event Collector server, execute:
+
+powershell
+Copy
+Edit
+  winrm quickconfig
+This command sets up the WinRM service and configures the necessary firewall exceptions.
+
+Enable Windows Event Collector Service: Run:
+
+powershell
+Copy
+Edit
+  wecutil qc
+This initializes the Event Collector service to receive events.
+
+b. Configure Source Computers
+
+Enable WinRM: On each source computer, execute:
+
+powershell
+Copy
+Edit
+  winrm quickconfig
+Add Event Collector to Event Log Readers Group: On each source computer, add the Event Collector's computer account to the Event Log Readers group to grant necessary permissions.
+c. Create and Deploy Group Policy Object (GPO)
+
+Open Group Policy Management Console (GPMC): On a Domain Controller or a system with GPMC installed.
+
+Create a New GPO: Right-click on the desired Organizational Unit (OU) and select Create a GPO in this domain, and Link it here...
+
+Configure Subscription Manager:
+
+Navigate to:
+
+pgsql
+Copy
+Edit
+Computer Configuration → Policies → Administrative Templates → Windows Components → Event Forwarding → Configure target Subscription Manager
+Enable the policy and set the server address:
+
+arduino
+Copy
+Edit
+Server=http://<EventCollector_FQDN>:5985/wsman/SubscriptionManager/WEC,Refresh=60
+Replace <EventCollector_FQDN> with the Fully Qualified Domain Name of the Event Collector server.
+
+Configure Log Access:
+
+Navigate to:
+
+pgsql
+Copy
+Edit
+Computer Configuration → Policies → Administrative Templates → Windows Components → Event Log Service → Security → Configure log access
+Set the appropriate Security Descriptor Definition Language (SDDL) to grant the Event Collector access to the Security event log.
+
+Link GPO to Source Computers: Ensure the GPO is linked to the OU containing the source computers.
+
+d. Configure Event Subscriptions on Event Collector
+
+Open Event Viewer: On the Event Collector server.
+
+Create a New Subscription:
+
+Right-click on Subscriptions and select Create Subscription.
+
+Define the subscription criteria, such as the events to collect and the source computers.
+
+e. Verify Functionality
+
+Force GPO Update: On source computers, run:
+
+powershell
+Copy
+Edit
+  gpupdate /force
+Check Event Forwarding Status: On the Event Collector server, verify that events from source computers are being received in the Forwarded Events log.
+4. References
+
+Configure Windows Event Forwarding
+
+Efficient Windows Event Collector Setup & Configuration
+
+By following these steps, we established a centralized logging infrastructure using Windows Event Forwarding in our AWS environment, enhancing our monitoring and security capabilities.
